@@ -1,0 +1,48 @@
+2025-01-19T18:09:49.383+09:00  INFO 7160 --- [main] csw.subsync.SubsyncApplication           : Starting SubsyncApplication using Java 23.0.1 with PID 7160 (D:\Dev\Java\subsync\build\classes\java\main started by dev in D:\Dev\Java\subsync)
+2025-01-19T18:09:49.385+09:00  INFO 7160 --- [main] csw.subsync.SubsyncApplication           : No active profile set, falling back to 1 default profile: "default"
+2025-01-19T18:09:50.147+09:00  INFO 7160 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2025-01-19T18:09:50.148+09:00  INFO 7160 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2025-01-19T18:09:50.163+09:00  INFO 7160 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 7 ms. Found 0 JPA repository interfaces.
+2025-01-19T18:09:50.172+09:00  INFO 7160 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Multiple Spring Data modules found, entering strict repository configuration mode
+2025-01-19T18:09:50.173+09:00  INFO 7160 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data Redis repositories in DEFAULT mode.
+2025-01-19T18:09:50.180+09:00  INFO 7160 --- [main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 0 ms. Found 0 Redis repository interfaces.
+2025-01-19T18:09:50.839+09:00  INFO 7160 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat initialized with port 8080 (http)
+2025-01-19T18:09:50.852+09:00  INFO 7160 --- [main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2025-01-19T18:09:50.852+09:00  INFO 7160 --- [main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/10.1.34]
+2025-01-19T18:09:50.906+09:00  INFO 7160 --- [main] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring embedded WebApplicationContext
+2025-01-19T18:09:50.906+09:00  INFO 7160 --- [main] w.s.c.ServletWebServerApplicationContext : Root WebApplicationContext: initialization completed in 1476 ms
+2025-01-19T18:09:51.154+09:00  INFO 7160 --- [main] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2025-01-19T18:09:51.196+09:00  INFO 7160 --- [main] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 6.6.4.Final
+2025-01-19T18:09:51.220+09:00  INFO 7160 --- [main] o.h.c.internal.RegionFactoryInitiator    : HHH000026: Second-level cache disabled
+2025-01-19T18:09:51.440+09:00  INFO 7160 --- [main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2025-01-19T18:09:51.462+09:00  INFO 7160 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2025-01-19T18:09:51.616+09:00  INFO 7160 --- [main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@771cbd13
+2025-01-19T18:09:51.617+09:00  INFO 7160 --- [main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2025-01-19T18:09:51.677+09:00  INFO 7160 --- [main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'HikariDataSource (HikariPool-1)']
+	Database driver: undefined/unknown
+	Database version: 17.2
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2025-01-19T18:09:51.918+09:00  INFO 7160 --- [main] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+2025-01-19T18:09:51.922+09:00  INFO 7160 --- [main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2025-01-19T18:09:52.832+09:00  WARN 7160 --- [main] .s.s.UserDetailsServiceAutoConfiguration : 
+
+Using generated security password: ffbad355-d6ac-4afc-92ea-5fe1894926d9
+
+This generated password is for development use only. Your security configuration must be updated before running your application in production.
+
+2025-01-19T18:09:52.844+09:00  INFO 7160 --- [main] r$InitializeUserDetailsManagerConfigurer : Global AuthenticationManager configured with UserDetailsService bean with name inMemoryUserDetailsManager
+2025-01-19T18:09:52.945+09:00  INFO 7160 --- [main] o.s.b.a.e.web.EndpointLinksResolver      : Exposing 3 endpoints beneath base path '/actuator'
+2025-01-19T18:09:53.175+09:00  INFO 7160 --- [main] o.s.b.w.embedded.tomcat.TomcatWebServer  : Tomcat started on port 8080 (http) with context path '/'
+2025-01-19T18:09:53.186+09:00  INFO 7160 --- [main] csw.subsync.SubsyncApplication           : Started SubsyncApplication in 4.191 seconds (process running for 4.758)
+2025-01-19T18:09:53.668+09:00  INFO 7160 --- [RMI TCP Connection(3)-211.105.30.225] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2025-01-19T18:09:53.669+09:00  INFO 7160 --- [RMI TCP Connection(3)-211.105.30.225] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2025-01-19T18:09:53.672+09:00  INFO 7160 --- [RMI TCP Connection(3)-211.105.30.225] o.s.web.servlet.DispatcherServlet        : Completed initialization in 2 ms
+2025-01-19T18:10:31.135+09:00  INFO 7160 --- [SpringApplicationShutdownHook] o.s.b.w.e.tomcat.GracefulShutdown        : Commencing graceful shutdown. Waiting for active requests to complete
+2025-01-19T18:10:31.146+09:00  INFO 7160 --- [tomcat-shutdown] o.s.b.w.e.tomcat.GracefulShutdown        : Graceful shutdown complete
+2025-01-19T18:10:31.162+09:00  INFO 7160 --- [SpringApplicationShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2025-01-19T18:10:31.164+09:00  INFO 7160 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2025-01-19T18:10:31.167+09:00  INFO 7160 --- [SpringApplicationShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.
