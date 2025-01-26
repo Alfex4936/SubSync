@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 @Slf4j
@@ -128,7 +129,7 @@ public class SubscriptionService {
 
     private void storeGroupInRedis(SubscriptionGroup group) {
         String key = "subscription:" + group.getId();
-        redisTemplate.opsForValue().set(key, group.getId());
+        redisTemplate.opsForValue().set(key, group.getId(), 35, TimeUnit.DAYS); // 35 days expiration
     }
 
     private void deleteGroupFromRedis(Long groupId) {

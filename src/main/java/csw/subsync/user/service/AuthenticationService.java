@@ -7,7 +7,7 @@ import csw.subsync.user.dto.AuthenticationRequest;
 import csw.subsync.user.dto.AuthenticationResponse;
 import csw.subsync.user.dto.RefreshTokenRequest;
 import csw.subsync.user.dto.UserRegisterRequest;
-import csw.subsync.user.model.Role;
+import csw.subsync.user.model.role.Role;
 import csw.subsync.user.model.User;
 import csw.subsync.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -45,7 +45,7 @@ public class AuthenticationService {
                 .username(request.getUsername())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .role(Role.USER)
+                .role(Role.USER) // default role
                 .build();
         repository.save(user); // var savedUser =
 //        var jwtToken = jwtService.generateToken(user);

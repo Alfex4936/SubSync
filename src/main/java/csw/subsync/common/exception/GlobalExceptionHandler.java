@@ -1,5 +1,9 @@
 package csw.subsync.common.exception;
 
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.JwtException;
+import io.jsonwebtoken.MalformedJwtException;
+import io.jsonwebtoken.SignatureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -12,6 +16,43 @@ import java.util.Map;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    /**** JWT 예외 처리 ****/
+    @ExceptionHandler(ExpiredJwtException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Map<String, String> handleExpiredJwt(ExpiredJwtException ex) {
+        return Map.of(
+                "error", "JWT token expired",
+                "message", "Token expired at " + ex.getClaims().getExpiration()
+        );
+    }
+
+    @ExceptionHandler(MalformedJwtException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Map<String, String> handleMalformedJwt() {
+        return Map.of(
+                "error", "Invalid JWT format",
+                "message", "Authorization header value is not a valid JWT"
+        );
+    }
+
+    @ExceptionHandler(SignatureException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Map<String, String> handleSignatureException() {
+        return Map.of(
+                "error", "Invalid JWT signature",
+                "message", "Token signature verification failed"
+        );
+    }
+
+    @ExceptionHandler(JwtException.class)
+    @ResponseStatus(HttpStatus.UNAUTHORIZED)
+    public Map<String, String> handleGenericJwtException(JwtException ex) {
+        return Map.of(
+                "error", "Invalid JWT token",
+                "message", ex.getMessage()
+        );
+    }
 
     // Validation 오류 처리
     @ExceptionHandler(MethodArgumentNotValidException.class)

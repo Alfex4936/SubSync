@@ -1,5 +1,7 @@
 package csw.subsync.user.model;
 
+import csw.subsync.user.model.role.Role;
+import csw.subsync.user.model.role.RoleConverter;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -38,7 +40,8 @@ public class User implements UserDetails {
     @Column(length = 255, nullable = false)
     private String password;
 
-    @Enumerated(EnumType.STRING)
+//    @Enumerated(EnumType.STRING)
+    @Convert(converter = RoleConverter.class)
     private Role role;
 
     @Override
