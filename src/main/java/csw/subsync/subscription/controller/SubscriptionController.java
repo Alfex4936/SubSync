@@ -1,5 +1,6 @@
 package csw.subsync.subscription.controller;
 
+import csw.subsync.common.annotation.ApiV1;
 import csw.subsync.common.exception.ResourceNotFoundException;
 import csw.subsync.subscription.dto.SubscriptionCreateRequest;
 import csw.subsync.subscription.dto.SubscriptionGroupDto;
@@ -13,9 +14,10 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
-
+@ApiV1
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/subscriptions")
@@ -28,15 +30,17 @@ public class SubscriptionController {
     @Operation(summary = "구독 그룹 생성", description = "새로운 구독 그룹을 생성합니다.")
     @PostMapping("/create")
     public ResponseEntity<SubscriptionGroupDto> create(@RequestBody @Valid SubscriptionCreateRequest request) {
-        // Owner 찾기
-        User owner = userRepository.findById(request.getOwnerId())
-                .orElseThrow(() -> new ResourceNotFoundException("Owner not found"));
+        User owner = (User) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
 
         var group = subscriptionService.createGroup(
                 owner,
                 request.getTitle(),
                 request.getMaxMembers(),
-                request.getDurationDays()
+                request.getDurationDays(),
+                request.getPricingModel(),
+                request.getPriceAmount(),
+                request.getPriceCurrency()
         );
 
         // 201 Created와 함께 DTO 반환
@@ -50,8 +54,8 @@ public class SubscriptionController {
     @PostMapping("/join")
     public ResponseEntity<SubscriptionGroupDto> join(@RequestBody @Valid SubscriptionJoinRequest request) {
         // 사용자 확인
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+        User user = (User) SecurityContextHolder.getContext()
+                .getAuthentication().getPrincipal();
 
         var group = subscriptionService.joinGroup(request.getGroupId(), user);
 
@@ -60,6 +64,7 @@ public class SubscriptionController {
     }
 
     // Group 삭제
+    // TODO: creator or admin만 가능하도록 권한 제어
     @Operation(summary = "구독 그룹 삭제", description = "구독 그룹을 삭제합니다.")
     @DeleteMapping("/remove")
     public ResponseEntity<Void> remove(@RequestParam Long groupId,

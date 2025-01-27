@@ -3,7 +3,10 @@ package csw.subsync.user.model;
 import csw.subsync.user.model.role.Role;
 import csw.subsync.user.model.role.RoleConverter;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -43,6 +46,12 @@ public class User implements UserDetails {
 //    @Enumerated(EnumType.STRING)
     @Convert(converter = RoleConverter.class)
     private Role role;
+
+    @Column(name = "stripe_customer_id", length = 255)
+    private String stripeCustomerId;
+
+    @Column(name = "payment_method_id", length = 255)
+    private String paymentMethodId;
 
     @Override
     public List<SimpleGrantedAuthority> getAuthorities() {

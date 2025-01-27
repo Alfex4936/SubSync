@@ -11,9 +11,6 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class SubscriptionJoinRequest {
-    @NotNull(message = "User ID cannot be null")
-    private Long userId;
-
     @NotNull(message = "Group ID cannot be null")
     private Long groupId;
 }

@@ -3,7 +3,10 @@ package csw.subsync.subscription.model;
 
 import csw.subsync.user.model.User;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDate;
 
@@ -24,8 +27,12 @@ public class Membership {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Version
+    private Long version;
+
     private boolean paid;
     private boolean valid; // if user is kicked out or not
+    private LocalDate failedDate; // if user failed to pay, this date is set
 
     @ManyToOne
     @JoinColumn(name = "user_id")
@@ -35,6 +42,13 @@ public class Membership {
     @JoinColumn(name = "subscription_group_id")
     private SubscriptionGroup subscriptionGroup;
 
-    // TODO: update DB
-    private LocalDate failedDate; // if user failed to pay, this date will be set
+    @Enumerated(EnumType.STRING)
+    private PaymentStatus paymentStatus;
+
+    @Column(name = "stripe_payment_intent_id")
+    private String stripePaymentIntentId;
+
+    public enum PaymentStatus {
+        PROCESSING, SUCCEEDED, FAILED
+    }
 }

@@ -3,9 +3,8 @@ package csw.subsync.subscription.service;
 import csw.subsync.common.exception.GroupNotEmptyException;
 import csw.subsync.common.exception.GroupNotFoundException;
 import csw.subsync.common.exception.NotGroupOwnerException;
-import csw.subsync.common.exception.PaymentException;
-import csw.subsync.payment.service.PaymentService;
 import csw.subsync.subscription.model.Membership;
+import csw.subsync.subscription.model.PricingModel;
 import csw.subsync.subscription.model.SubscriptionGroup;
 import csw.subsync.subscription.repository.MembershipRepository;
 import csw.subsync.subscription.repository.SubscriptionGroupRepository;
@@ -32,14 +31,16 @@ import java.util.concurrent.TimeUnit;
 public class SubscriptionService {
     private final SubscriptionGroupRepository subscriptionGroupRepo;
     private final MembershipRepository membershipRepo;
-    private final PaymentService paymentService;
     private final MembershipService membershipService;
 
     private final RedisTemplate<Object, Object> redisTemplate;
 
     // 그룹 생성: 데이터 변경 작업이므로 트랜잭션 필요
     @Transactional
-    public SubscriptionGroup createGroup(User owner, String title, int maxMembers, int durationDays) {
+    public SubscriptionGroup createGroup(User owner, String title, int maxMembers, int durationDays,
+                                         PricingModel pricingModel,
+                                         Integer priceAmount,
+                                         String priceCurrency) {
         SubscriptionGroup group = new SubscriptionGroup();
         group.setTitle(title);
         group.setMaxMembers(maxMembers);
@@ -48,7 +49,21 @@ public class SubscriptionService {
         group.setOwner(owner);
         group.setStartDate(LocalDate.now());
         group.setEndDate(LocalDate.now().plusDays(durationDays));
+
+        group.setPricingModel(pricingModel == null ? PricingModel.FIXED : pricingModel);
+        group.setPriceAmount(priceAmount == null ? 0 : priceAmount);
+        group.setPriceCurrency((priceCurrency == null || priceCurrency.isEmpty()) ? "USD" : priceCurrency);
+
         subscriptionGroupRepo.save(group);
+
+        // Create a Membership for the owner
+        Membership ownerMembership = new Membership();
+        ownerMembership.setSubscriptionGroup(group);
+        ownerMembership.setUser(owner);
+        ownerMembership.setPaid(false);
+        ownerMembership.setValid(true);
+        membershipRepo.save(ownerMembership);
+        group.getMemberships().add(ownerMembership);
 
         storeGroupInRedis(group); // Redis 캐싱
         return group;
@@ -58,7 +73,7 @@ public class SubscriptionService {
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     public SubscriptionGroup joinGroup(Long groupId, User user) {
-        SubscriptionGroup group = subscriptionGroupRepo.findByIdAndActiveTrue(groupId);
+        SubscriptionGroup group = subscriptionGroupRepo.findByIdAndActiveTrueWithMemberships(groupId);
         if (group == null) {
             throw new RuntimeException("Group not found or inactive");
         }
@@ -79,6 +94,7 @@ public class SubscriptionService {
         group.getMemberships().add(m);
         if (group.getMemberships().size() == group.getMaxMembers()) {
             notifyFullGroup(group);
+            chargeAllMembers(group.getId()); // Auto-trigger payments
         }
 
         return group;
@@ -88,7 +104,7 @@ public class SubscriptionService {
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     public void removeGroup(Long groupId, User user) {
-        SubscriptionGroup group = subscriptionGroupRepo.findByIdAndActiveTrue(groupId);
+        SubscriptionGroup group = subscriptionGroupRepo.findByIdAndActiveTrueWithMemberships(groupId);
         if (group == null) throw new RuntimeException("Group not found");
         if (!group.getOwner().getId().equals(user.getId())) {
             throw new NotGroupOwnerException("User is not the owner of the group");
@@ -109,13 +125,16 @@ public class SubscriptionService {
 
     // 멤버십 요금 청구: 반복 작업에 대해 트랜잭션 분리
     public void chargeAllMembers(Long groupId) {
-        SubscriptionGroup group = subscriptionGroupRepo.findByIdAndActiveTrue(groupId);
+        SubscriptionGroup group = subscriptionGroupRepo.findByIdAndActiveTrueWithMemberships(groupId);
         if (group == null) {
             throw new GroupNotFoundException("Group not found or inactive");
         }
 
-        group.getMemberships().forEach(member -> membershipService.chargeMember(member, group));
+        // TODO: batch, if I wanna support more than...1000 members
+        group.getMemberships().forEach(membershipService::processMembershipPayment);
+//        group.getMemberships().forEach(member -> membershipService.chargeMember(member, group));
     }
+
 
     // 만료된 그룹 조회: 단순 조회 최적화
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
@@ -175,7 +194,7 @@ public class SubscriptionService {
 
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public SubscriptionGroup getGroupById(Long groupId) {
-        return subscriptionGroupRepo.findByIdAndActiveTrue(groupId);
+        return subscriptionGroupRepo.findByIdAndActiveTrueWithMemberships(groupId);
     }
 
 

@@ -49,6 +49,8 @@ dependencies {
 	// https://mvnrepository.com/artifact/com.fasterxml.jackson.module/jackson-module-afterburner
 	implementation group: 'com.fasterxml.jackson.module', name: 'jackson-module-afterburner', version: '2.18.2'
 
+// https://mvnrepository.com/artifact/com.stripe/stripe-java
+	implementation group: 'com.stripe', name: 'stripe-java', version: '28.2.0'
 
 
 	compileOnly 'org.projectlombok:lombok'

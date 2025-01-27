@@ -6,17 +6,15 @@ import csw.subsync.user.dto.AuthenticationResponse;
 import csw.subsync.user.dto.RefreshTokenRequest;
 import csw.subsync.user.dto.UserRegisterRequest;
 import csw.subsync.user.service.AuthenticationService;
-import io.swagger.v3.oas.annotations.security.SecurityRequirement;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 // NOT VERSIONING
 @Tag(name = "인증", description = "인증 API")

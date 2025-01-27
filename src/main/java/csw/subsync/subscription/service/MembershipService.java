@@ -1,9 +1,9 @@
 package csw.subsync.subscription.service;
 
-import csw.subsync.common.exception.PaymentException;
+import com.stripe.exception.StripeException;
+import com.stripe.model.PaymentIntent;
 import csw.subsync.payment.service.PaymentService;
 import csw.subsync.subscription.model.Membership;
-import csw.subsync.subscription.model.SubscriptionGroup;
 import csw.subsync.subscription.repository.MembershipRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,23 +21,51 @@ public class MembershipService {
     private final PaymentService paymentService;
 
     @Transactional
-    public void chargeMember(Membership member, SubscriptionGroup group) {
+    public void processMembershipPayment(Membership membership) {
         try {
-            boolean success = paymentService.charge(member.getUser(), group);
-            if (success) {
-                member.setPaid(true);
-                member.setFailedDate(null);
-            } else {
-                member.setPaid(false);
-                member.setFailedDate(LocalDate.now());
-            }
-            membershipRepo.save(member);
-        } catch (PaymentException e) {
-            log.error("Payment failed for user {}: {}", member.getUser().getId(), e.getMessage());
-            member.setPaid(false);
-            member.setFailedDate(LocalDate.now());
-            member.setValid(false);
-            membershipRepo.save(member);
+            PaymentIntent intent = paymentService.initiateSubscriptionPayment(membership);
+            membership.setPaymentStatus(Membership.PaymentStatus.PROCESSING);
+            membership.setStripePaymentIntentId(intent.getId());
+            membershipRepo.save(membership);
+        } catch (StripeException e) {
+            handlePaymentError(membership, e);
         }
+    }
+
+    @Transactional
+    public void handleSuccessfulPayment(Long membershipId, String paymentIntentId) {
+        Membership membership = membershipRepo.findById(membershipId)
+                .orElseThrow(() -> new RuntimeException("Membership not found"));
+
+        membership.setPaid(true);
+        membership.setPaymentStatus(Membership.PaymentStatus.SUCCEEDED);
+        membership.setFailedDate(null);
+        membership.setValid(true);
+        membership.setStripePaymentIntentId(paymentIntentId);
+        membershipRepo.save(membership);
+    }
+
+    @Transactional
+    public void handleFailedPayment(Long membershipId, String errorMessage) {
+        Membership membership = membershipRepo.findById(membershipId)
+                .orElseThrow(() -> new RuntimeException("Membership not found"));
+
+        membership.setPaid(false);
+        membership.setPaymentStatus(Membership.PaymentStatus.FAILED);
+        membership.setFailedDate(LocalDate.now());
+        membership.setValid(false);
+        membershipRepo.save(membership);
+
+        log.warn("Payment failed for membership {}: {}", membershipId, errorMessage);
+    }
+
+    private void handlePaymentError(Membership membership, Exception e) {
+        membership.setPaid(false);
+        membership.setPaymentStatus(Membership.PaymentStatus.FAILED);
+        membership.setFailedDate(LocalDate.now());
+        membership.setValid(false);
+        membershipRepo.save(membership);
+
+        log.error("Payment processing failed for membership {}: {}", membership.getId(), e.getMessage());
     }
 }
