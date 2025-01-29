@@ -5,7 +5,9 @@ import csw.subsync.common.exception.ResourceNotFoundException;
 import csw.subsync.subscription.dto.SubscriptionCreateRequest;
 import csw.subsync.subscription.dto.SubscriptionGroupDto;
 import csw.subsync.subscription.dto.SubscriptionJoinRequest;
+import csw.subsync.subscription.model.PredefinedSubscription;
 import csw.subsync.subscription.model.SubscriptionGroup;
+import csw.subsync.subscription.service.PredefinedSubscriptionService;
 import csw.subsync.subscription.service.SubscriptionService;
 import csw.subsync.user.model.User;
 import csw.subsync.user.repository.UserRepository;
@@ -17,6 +19,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @ApiV1
 @RequiredArgsConstructor
 @RestController
@@ -25,6 +29,7 @@ public class SubscriptionController {
 
     private final SubscriptionService subscriptionService;
     private final UserRepository userRepository;
+    private final PredefinedSubscriptionService predefinedSubscriptionService;
 
     // Group 생성
     @Operation(summary = "구독 그룹 생성", description = "새로운 구독 그룹을 생성합니다.")
@@ -33,14 +38,29 @@ public class SubscriptionController {
         User owner = (User) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
 
+        Integer priceAmount = request.getPriceAmount();
+        String priceCurrency = request.getPriceCurrency();
+
+        // Check if predefinedSubscriptionId is provided
+        if (request.getPredefinedSubscriptionId() != null) {
+            PredefinedSubscription predefinedSubscription = predefinedSubscriptionService.getPredefinedSubscriptionById(request.getPredefinedSubscriptionId());
+            priceAmount = predefinedSubscription.getPriceAmount();
+            priceCurrency = predefinedSubscription.getPriceCurrency();
+        } else {
+            // Validate priceAmount and priceCurrency if predefinedSubscriptionId is not provided
+            if (priceAmount == null || priceCurrency == null || priceCurrency.isEmpty()) {
+                return ResponseEntity.badRequest().build(); // TODO: throw a custom exception
+            }
+        }
+
         var group = subscriptionService.createGroup(
                 owner,
                 request.getTitle(),
                 request.getMaxMembers(),
                 request.getDurationDays(),
                 request.getPricingModel(),
-                request.getPriceAmount(),
-                request.getPriceCurrency()
+                priceAmount, // Use determined priceAmount
+                priceCurrency // Use determined priceCurrency
         );
 
         // 201 Created와 함께 DTO 반환
@@ -86,6 +106,12 @@ public class SubscriptionController {
         subscriptionService.chargeAllMembers(groupId);
         // 성공 시 200 OK (Body 없음)
         return ResponseEntity.ok().build();
+    }
+
+    @GetMapping("/list")
+    public ResponseEntity<List<PredefinedSubscription>> getPredefinedSubscriptionList() {
+        List<PredefinedSubscription> subscriptions = predefinedSubscriptionService.getAllPredefinedSubscriptions();
+        return ResponseEntity.ok(subscriptions);
     }
 
     // 간단한 엔티티 -> DTO 변환 메서드

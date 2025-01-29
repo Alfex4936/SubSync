@@ -51,6 +51,7 @@ public class StripeWebhookController {
     }
 
     private void handlePaymentSuccess(Event event) {
+//        PaymentIntent intent = (PaymentIntent) event.getDataObjectDeserializer().getObject().get();
         PaymentIntent intent = (PaymentIntent) event.getData().getObject();
         Long membershipId = Long.parseLong(intent.getMetadata().get("membership_id"));
         membershipService.handleSuccessfulPayment(membershipId, intent.getId());

@@ -15,7 +15,7 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.util.StdDateFormat;
 import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.fasterxml.jackson.module.afterburner.AfterburnerModule;
+import com.fasterxml.jackson.module.blackbird.BlackbirdModule;
 import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -34,7 +34,8 @@ public class ObjectMapperConfig {
                 .addModule(new JavaTimeModule())      // For Java 8 (JSR-310) date/time support
                 .addModule(new Jdk8Module())          // For Optionals and other JDK8 goodies
                 .addModule(new ParameterNamesModule())// For better constructor parameter name introspection
-                .addModule(new AfterburnerModule())   // For performance optimizations
+                // .addModule(new AfterburnerModule())   // For performance optimizations
+                .addModule(new BlackbirdModule())     // For performance optimizations (jdk 11+, https://github.com/FasterXML/jackson-modules-base/tree/2.19/blackbird)
 
                 // BigDecimal behavior: disable STRIP_TRAILING_BIGDECIMAL_ZEROES to mimic "withExactBigDecimals(true)"
                 .disable(JsonNodeFeature.STRIP_TRAILING_BIGDECIMAL_ZEROES)

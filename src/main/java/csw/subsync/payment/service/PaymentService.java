@@ -107,6 +107,7 @@ public class PaymentService {
             case "EUR" -> 5;
             case "USD" -> 6;
             case "GBP" -> 7;
+            case "KRW" -> 10000;
             default -> 5;
         };
 

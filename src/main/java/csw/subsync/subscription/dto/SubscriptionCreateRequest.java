@@ -27,14 +27,16 @@ public class SubscriptionCreateRequest {
     @NotNull(message = "Pricing model cannot be null")
     private PricingModel pricingModel;
 
+    private Long predefinedSubscriptionId;
+
     // Price must be non-null if it’s required, and possibly > 0
-    @NotNull(message = "Price amount cannot be null")
+    // @NotNull(message = "Price amount cannot be null")
     @Min(value = 1, message = "Price amount must be more than 0")
     @Max(value = Integer.MAX_VALUE, message = "Price amount is too high")
     private Integer priceAmount;
 
     // 3 uppercase letters only
-    @NotBlank(message = "Price currency cannot be blank")
+    // @NotBlank(message = "Price currency cannot be blank")
     @Pattern(regexp = "^[A-Z]{3}$", message = "Price currency must be a 3-letter ISO code (e.g. USD)")
     private String priceCurrency;
 }

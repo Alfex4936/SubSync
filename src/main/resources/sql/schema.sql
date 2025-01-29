@@ -94,3 +94,16 @@ ALTER TABLE memberships
         FOREIGN KEY (subscription_group_id)
             REFERENCES subscription_groups (id)
             ON DELETE CASCADE;   -- This ensures memberships are removed if the parent subscription group is deleted
+
+
+CREATE TABLE predefined_subscriptions (
+                                          id BIGSERIAL PRIMARY KEY,
+                                          name VARCHAR(255) NOT NULL UNIQUE,  -- Unique constraint enforced here and by index
+                                          price_amount INTEGER,               -- Assuming price in cents
+                                          price_currency VARCHAR(3)           -- ISO currency code (e.g., USD, KRW)
+);
+
+-- Explicitly creating a unique index on the 'name' column.
+-- While the UNIQUE constraint on 'name' already creates a unique index,
+-- this statement makes it explicit and allows for naming the index.
+CREATE UNIQUE INDEX idx_predefined_subscriptions_name ON predefined_subscriptions (name);
