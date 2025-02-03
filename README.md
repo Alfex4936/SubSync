@@ -1,6 +1,8 @@
 # SubSync
 
-on going
+Share subscription fees with friends.
+
+TBD
 
 # Stack
 - Java 23
@@ -8,6 +10,14 @@ on going
 - Spring Security 6
 - Postgres 17
 - Redis 7.4
+
+-- 
+- [X] Spring Security
+- [X] Spring Data JPA (Postgres)
+- [x] Redis setup
+- [x] Stripe API setup
+- [x] JWT User register/login
+
 
 # Stripe API
 

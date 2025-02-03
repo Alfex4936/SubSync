@@ -48,6 +48,9 @@ public class Membership {
     @Column(name = "stripe_payment_intent_id")
     private String stripePaymentIntentId;
 
+    @Column(name = "stripe_order_id", unique = true)
+    private String stripeOrderId;
+
     public enum PaymentStatus {
         PROCESSING, SUCCEEDED, FAILED
     }

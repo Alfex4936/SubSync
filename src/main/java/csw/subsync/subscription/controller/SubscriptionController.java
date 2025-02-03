@@ -16,6 +16,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
@@ -84,16 +85,15 @@ public class SubscriptionController {
     }
 
     // Group 삭제
-    // TODO: creator or admin만 가능하도록 권한 제어
+    @PreAuthorize("@securityExpression.canRemoveGroup(authentication, #groupId)")
     @Operation(summary = "구독 그룹 삭제", description = "구독 그룹을 삭제합니다.")
     @DeleteMapping("/remove")
-    public ResponseEntity<Void> remove(@RequestParam Long groupId,
-                                       @RequestParam Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
+    public ResponseEntity<Void> remove(@RequestParam Long groupId) {
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         // 삭제 실행
-        subscriptionService.removeGroup(groupId, user);
+        subscriptionService.removeGroup(groupId);
 
         // 성공 시 204 No Content
         return ResponseEntity.noContent().build();

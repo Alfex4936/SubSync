@@ -103,15 +103,19 @@ public class SubscriptionService {
     // 그룹 삭제: 동시성 문제 해결을 위해 비관적 락 사용
     @Transactional(isolation = Isolation.REPEATABLE_READ)
     @Lock(LockModeType.PESSIMISTIC_WRITE)
-    public void removeGroup(Long groupId, User user) {
+    public void removeGroup(Long groupId) {
         SubscriptionGroup group = subscriptionGroupRepo.findByIdAndActiveTrueWithMemberships(groupId);
         if (group == null) throw new RuntimeException("Group not found");
-        if (!group.getOwner().getId().equals(user.getId())) {
-            throw new NotGroupOwnerException("User is not the owner of the group");
-        }
+
+        // We do NOT check group.getOwner() vs. user ID here anymore
+        // because the @PreAuthorize check already guaranteed that condition
+//        if (!group.getOwner().getId().equals(user.getId())) {
+//            throw new NotGroupOwnerException("User is not the owner of the group");
+//        }
 
         // Ensure the group is empty or only contains the owner
-        if (group.getMemberships().stream().anyMatch(m -> !m.getUser().equals(user))) {
+        User owner = group.getOwner();
+        if (group.getMemberships().stream().anyMatch(m -> !m.getUser().equals(owner))) {
             throw new GroupNotEmptyException("Cannot delete group with other members");
         }
 

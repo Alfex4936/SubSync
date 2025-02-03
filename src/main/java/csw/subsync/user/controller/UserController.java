@@ -42,7 +42,6 @@ public class UserController {
         String clientSecret = paymentService.createPaymentSetupSession(user.getId());
         return ResponseEntity.ok(new PaymentSetupResponse(clientSecret));
     }
-
 }
 
 /*

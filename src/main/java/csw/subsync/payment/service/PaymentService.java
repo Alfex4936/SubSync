@@ -7,6 +7,7 @@ import com.stripe.model.SetupIntent;
 import csw.subsync.common.exception.PaymentException;
 import csw.subsync.subscription.model.Membership;
 import csw.subsync.subscription.model.SubscriptionGroup;
+import csw.subsync.subscription.repository.MembershipRepository;
 import csw.subsync.user.model.User;
 import csw.subsync.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.util.Currency;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Slf4j
 @Service
@@ -24,6 +26,7 @@ public class PaymentService {
 
     private final StripeService stripeService;
     private final UserRepository userRepository;
+    private final MembershipRepository membershipRepository;
 
     private String fetchStripePaymentMethodId(User user) {
         // retrieve from user's payment info in the DB
@@ -50,6 +53,7 @@ public class PaymentService {
         params.put("usage", "off_session");
         params.put("metadata", Map.of("user_id", user.getId()));
 
+
         SetupIntent setupIntent = SetupIntent.create(params);
         return setupIntent.getClientSecret();
     }
@@ -63,9 +67,17 @@ public class PaymentService {
 
         SubscriptionGroup group = membership.getSubscriptionGroup();
 
+        // Generate a unique order_id if it doesn't already exist
+        if (membership.getStripeOrderId() == null || membership.getStripeOrderId().isBlank()) {
+            String newOrderId = UUID.randomUUID().toString();
+            membership.setStripeOrderId(newOrderId);
+            membershipRepository.save(membership);
+        }
+
         Map<String, String> metadata = new HashMap<>();
         metadata.put("membership_id", membership.getId().toString());
         metadata.put("group_id", group.getId().toString());
+        metadata.put("order_id", membership.getStripeOrderId()); // Use the persisted order ID
 
         return stripeService.createPaymentIntent(
                 calculateAmount(group),
