@@ -72,7 +72,8 @@ CREATE TABLE IF NOT EXISTS memberships (
                                            user_id                  BIGINT,
                                            subscription_group_id    BIGINT,
                                            payment_status           VARCHAR(50),    -- Alternatively, define a PostgreSQL ENUM type
-                                           stripe_payment_intent_id VARCHAR(255)
+                                           stripe_payment_intent_id VARCHAR(255),
+                                           stripe_order_id VARCHAR(255) UNIQUE
 );
 
 -- Indexes for memberships

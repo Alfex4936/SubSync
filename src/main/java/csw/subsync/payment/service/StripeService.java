@@ -53,7 +53,7 @@ public class StripeService {
                 "allow_redirects", "never"
         ));
 
-        // Use a unique idempotency key based on your business logic
+        // Use a unique idempotency key
         RequestOptions requestOptions = RequestOptions.builder()
                 .setIdempotencyKey(generateUniqueKeyForPaymentIntent(metadata))
                 .build();

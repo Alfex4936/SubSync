@@ -16,7 +16,8 @@ import java.time.LocalDate;
         indexes = {
                 @Index(name = "idx_memberships_user_id", columnList = "user_id"),
                 @Index(name = "idx_memberships_subscription_group_id", columnList = "subscription_group_id")
-        }
+        },
+        uniqueConstraints = @UniqueConstraint(columnNames = "stripe_order_id")
 )
 @Getter
 @Setter
@@ -48,7 +49,7 @@ public class Membership {
     @Column(name = "stripe_payment_intent_id")
     private String stripePaymentIntentId;
 
-    @Column(name = "stripe_order_id", unique = true)
+    @Column(name = "stripe_order_id", length = 255, nullable = false, unique = true)
     private String stripeOrderId;
 
     public enum PaymentStatus {
