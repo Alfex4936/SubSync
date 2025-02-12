@@ -1,7 +1,7 @@
 package csw.subsync.subscription.controller;
 
 import csw.subsync.common.annotation.ApiV1;
-import csw.subsync.common.exception.ResourceNotFoundException;
+import csw.subsync.subscription.doc.SubscriptionControllerDoc;
 import csw.subsync.subscription.dto.SubscriptionCreateRequest;
 import csw.subsync.subscription.dto.SubscriptionGroupDto;
 import csw.subsync.subscription.dto.SubscriptionJoinRequest;
@@ -11,14 +11,12 @@ import csw.subsync.subscription.service.PredefinedSubscriptionService;
 import csw.subsync.subscription.service.SubscriptionService;
 import csw.subsync.user.model.User;
 import csw.subsync.user.repository.UserRepository;
-import io.swagger.v3.oas.annotations.Operation;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
@@ -26,16 +24,14 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/subscriptions")
-public class SubscriptionController {
+public class SubscriptionController implements SubscriptionControllerDoc {
 
     private final SubscriptionService subscriptionService;
-    private final UserRepository userRepository;
+//    private final UserRepository userRepository;
     private final PredefinedSubscriptionService predefinedSubscriptionService;
 
-    // Group 생성
-    @Operation(summary = "구독 그룹 생성", description = "새로운 구독 그룹을 생성합니다.")
-    @PostMapping("/create")
-    public ResponseEntity<SubscriptionGroupDto> create(@RequestBody @Valid SubscriptionCreateRequest request) {
+    @Override
+    public ResponseEntity<SubscriptionGroupDto> create(SubscriptionCreateRequest request) {
         User owner = (User) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
 
@@ -70,10 +66,8 @@ public class SubscriptionController {
                 .body(toDto(group));
     }
 
-    // Group 참여
-    @Operation(summary = "구독 그룹 참여", description = "기존 구독 그룹에 참여합니다.")
-    @PostMapping("/join")
-    public ResponseEntity<SubscriptionGroupDto> join(@RequestBody @Valid SubscriptionJoinRequest request) {
+    @Override
+    public ResponseEntity<SubscriptionGroupDto> join(SubscriptionJoinRequest request) {
         // 사용자 확인
         User user = (User) SecurityContextHolder.getContext()
                 .getAuthentication().getPrincipal();
@@ -84,11 +78,8 @@ public class SubscriptionController {
         return ResponseEntity.ok(toDto(group));
     }
 
-    // Group 삭제
-    @PreAuthorize("@securityExpression.canRemoveGroup(authentication, #groupId)")
-    @Operation(summary = "구독 그룹 삭제", description = "구독 그룹을 삭제합니다.")
-    @DeleteMapping("/remove")
-    public ResponseEntity<Void> remove(@RequestParam Long groupId) {
+    @Override
+    public ResponseEntity<Void> remove(Long groupId) {
 //        User user = userRepository.findById(userId)
 //                .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
@@ -99,16 +90,14 @@ public class SubscriptionController {
         return ResponseEntity.noContent().build();
     }
 
-    // 멤버 요금 청구
-    @Operation(summary = "멤버 요금 청구", description = "구독 그룹의 모든 멤버에게 요금을 청구합니다.")
-    @PostMapping("/charge")
-    public ResponseEntity<Void> charge(@RequestParam Long groupId) {
+    @Override
+    public ResponseEntity<Void> charge(Long groupId) {
         subscriptionService.chargeAllMembers(groupId);
         // 성공 시 200 OK (Body 없음)
         return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/list")
+    @Override
     public ResponseEntity<List<PredefinedSubscription>> getPredefinedSubscriptionList() {
         List<PredefinedSubscription> subscriptions = predefinedSubscriptionService.getAllPredefinedSubscriptions();
         return ResponseEntity.ok(subscriptions);
