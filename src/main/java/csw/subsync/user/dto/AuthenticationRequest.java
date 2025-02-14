@@ -1,16 +1,14 @@
 package csw.subsync.user.dto;
 
-import lombok.AllArgsConstructor;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class AuthenticationRequest {
+public record AuthenticationRequest(
+        @Schema(description = "로그인 사용자 이름", example = "user123")
+        String username,
 
-    private String username;
-    String password;
+        @Schema(description = "로그인 비밀번호", example = "p@ssw0rd!")
+        String password
+) {
 }

@@ -10,7 +10,6 @@ import csw.subsync.subscription.model.SubscriptionGroup;
 import csw.subsync.subscription.service.PredefinedSubscriptionService;
 import csw.subsync.subscription.service.SubscriptionService;
 import csw.subsync.user.model.User;
-import csw.subsync.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -2,7 +2,6 @@ package csw.subsync.subscription.service;
 
 import csw.subsync.common.exception.GroupNotEmptyException;
 import csw.subsync.common.exception.GroupNotFoundException;
-import csw.subsync.common.exception.NotGroupOwnerException;
 import csw.subsync.subscription.model.Membership;
 import csw.subsync.subscription.model.PricingModel;
 import csw.subsync.subscription.model.SubscriptionGroup;
@@ -14,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;

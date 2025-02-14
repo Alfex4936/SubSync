@@ -6,17 +6,31 @@ import csw.subsync.user.model.role.AdminRole;
 import csw.subsync.user.model.role.ManagerRole;
 import csw.subsync.user.model.role.Role;
 import csw.subsync.user.model.role.UserRole;
+import io.swagger.v3.oas.annotations.media.Schema;
 
 import java.util.Set;
 import java.util.stream.Collectors;
 
 public record UserProfileResponse(
+
+        @Schema(description = "사용자 식별자", example = "1")
         Long id,
+
+        @Schema(description = "사용자 이름", example = "user123")
         String username,
+
+        @Schema(description = "사용자 이메일 주소", example = "user@example.com")
         String email,
+
+        @Schema(description = "사용자의 역할", example = "AdminRole")
         String role,
+
+        @Schema(description = "역할 별 권한 목록", example = "[\"READ\", \"WRITE\", \"DELETE\"]")
         Set<String> permissions,
+
+        @Schema(description = "역할에 대한 설명", example = "System Administrator with full privileges")
         String roleDescription
+
 ) {
     public UserProfileResponse(User user) {
         this(

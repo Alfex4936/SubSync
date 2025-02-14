@@ -1,19 +1,16 @@
 package csw.subsync.user.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 
-@Data
 @Builder
-@AllArgsConstructor
-@NoArgsConstructor
-public class AuthenticationResponse {
+public record AuthenticationResponse(
+        @Schema(description = "엑세스 토큰", example = "eyJhbGciOiJI...")
+        @JsonProperty("access_token")
+        String accessToken,
 
-    @JsonProperty("access_token")
-    private String accessToken;
-    @JsonProperty("refresh_token")
-    private String refreshToken;
-}
+        @Schema(description = "리프레시 토큰", example = "eyJhbGciOiJI...")
+        @JsonProperty("refresh_token")
+        String refreshToken
+) {}

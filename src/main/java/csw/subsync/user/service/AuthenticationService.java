@@ -32,19 +32,19 @@ public class AuthenticationService {
     public void register(UserRegisterRequest request) {
         // Check for duplicate username
         // 트랜잭션 전파 수준(Propagation.SUPPORTS)은 상위 트랜잭션(register)이 존재하면 그 트랜잭션에 참여
-        if (usernameExists(request.getUsername())) {
+        if (usernameExists(request.username())) {
             throw new DuplicateResourceException("Username already exists");
         }
 
         // Check for duplicate email
-        if (emailExists(request.getEmail())) {
+        if (emailExists(request.email())) {
             throw new DuplicateResourceException("Email already exists");
         }
 
         var user = User.builder()
-                .username(request.getUsername())
-                .email(request.getEmail())
-                .password(passwordEncoder.encode(request.getPassword()))
+                .username(request.username())
+                .email(request.email())
+                .password(passwordEncoder.encode(request.password()))
                 .role(Role.USER) // default role
                 .build();
         repository.save(user); // var savedUser =
@@ -59,11 +59,11 @@ public class AuthenticationService {
     public AuthenticationResponse authenticate(AuthenticationRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getUsername(),
-                        request.getPassword()
+                        request.username(),
+                        request.password()
                 )
         );
-        var user = repository.findByUsername(request.getUsername())
+        var user = repository.findByUsername(request.username())
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
         var jwtToken = jwtService.generateToken(user);
         var refreshToken = jwtService.generateRefreshToken(user);
@@ -76,11 +76,11 @@ public class AuthenticationService {
     public AuthenticationResponse refreshToken(
             RefreshTokenRequest request
     ) {
-        String userEmail = jwtService.extractUsername(request.getRefreshToken());
+        String userEmail = jwtService.extractUsername(request.refreshToken());
         if (userEmail != null) {
             var user = this.repository.findByUsername(userEmail)
                     .orElseThrow();
-            if (jwtService.isTokenValid(request.getRefreshToken(), user)) {
+            if (jwtService.isTokenValid(request.refreshToken(), user)) {
                 var accessToken = jwtService.generateToken(user);
                 var newRefreshToken = jwtService.generateRefreshToken(user);
                 return AuthenticationResponse.builder()
@@ -97,6 +97,7 @@ public class AuthenticationService {
     public boolean usernameExists(String username) {
         return repository.existsByUsername(username);
     }
+
     @Transactional(readOnly = true, propagation = Propagation.SUPPORTS)
     public boolean emailExists(String email) {
         return repository.existsByEmail(email);
