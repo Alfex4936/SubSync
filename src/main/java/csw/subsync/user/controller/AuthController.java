@@ -1,5 +1,6 @@
 package csw.subsync.user.controller;
 
+import csw.subsync.common.annotation.RateLimit;
 import csw.subsync.user.doc.AuthControllerDoc;
 import csw.subsync.user.dto.AuthenticationRequest;
 import csw.subsync.user.dto.AuthenticationResponse;
@@ -22,6 +23,7 @@ public class AuthController implements AuthControllerDoc {
     }
 
     @Override
+    @RateLimit(key = "register", permitsPerSecond = 1, tolerance = 1000) // 1 req/sec, 1 sec tolerance
     @PostMapping("/register")
     public ResponseEntity<Void> register(
             @RequestBody UserRegisterRequest request
@@ -43,6 +45,7 @@ public class AuthController implements AuthControllerDoc {
     }
 
     @Override
+    @RateLimit(key = "username-exists", permitsPerSecond = 10, tolerance = 1000)
     @GetMapping("/username-exists")
     public ResponseEntity<Boolean> checkUsernameExists(@RequestParam String username) {
         boolean exists = authenticationService.usernameExists(username);
